@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureWeb Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <h1>SecureWeb Integration Test</h1>
+    <div id="test-results"></div>
+    
+    <form id="test-form">
+        <input type="text" name="test-input" placeholder="Test input">
+        <button type="submit">Submit</button>
+    </form>
+    
+    <script>
+        const results = document.getElementById('test-results');
+        
+        function addResult(message, type) {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+        
+        // Test 1: Check if SDK is loaded
+        setTimeout(() => {
+            if (window.SecureWeb) {
+                addResult('✓ SDK loaded successfully', 'pass');
+            } else {
+                addResult('✗ SDK not loaded - check script tag', 'fail');
+            }
+        }, 100);
+        
+        // Test 2: Check CSRF token
+        setTimeout(() => {
+            if (window.SecureWeb) {
+                const token = window.SecureWeb.getCSRFToken();
+                if (token && token.length === 64) {
+                    addResult(`✓ CSRF token generated: ${token.substring(0, 16)}...`, 'pass');
+                } else {
+                    addResult('✗ CSRF token invalid', 'fail');
+                }
+            }
+        }, 200);
+        
+        // Test 3: Check form protection
+        setTimeout(() => {
+            const form = document.getElementById('test-form');
+            const tokenInput = form.querySelector('input[name="secureweb_csrf_token"]');
+            if (tokenInput) {
+                addResult('✓ CSRF token injected into form', 'pass');
+            } else {
+                addResult('✗ CSRF token not injected into form', 'fail');
+            }
+        }, 500);
+        
+        // Test 4: Test XSS protection
+        setTimeout(() => {
+            const testDiv = document.createElement('div');
+            const xssPayload = '<script>alert("XSS")</script>';
+            testDiv.innerHTML = xssPayload;
+            
+            if (testDiv.innerHTML.includes('<script>')) {
+                addResult('✗ XSS protection not working', 'fail');
+            } else {
+                addResult('✓ XSS protection working - script tags sanitized', 'pass');
+            }
+        }, 600);
+        
+        // Test 5: Test API methods
+        setTimeout(() => {
+            if (window.SecureWeb) {
+                try {
+                    window.SecureWeb.updateConfig({ debug: true });
+                    addResult('✓ Config update working', 'pass');
+                } catch (e) {
+                    addResult('✗ Config update failed', 'fail');
+                }
+            }
+        }, 700);
+        
+        // Summary
+        setTimeout(() => {
+            addResult('Integration test complete. Check browser console for debug logs.', 'info');
+        }, 1000);
+    </script>
+</body>
+</html>

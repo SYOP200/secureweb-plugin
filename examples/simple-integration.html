@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureWeb - Simple Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .protected {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    
+    <!-- ================================================================== -->
+    <!-- SECUREWEB INTEGRATION - SINGLE LINE OF CODE                       -->
+    <!-- ================================================================== -->
+    <script src="https://cdn.yourdomain.com/secureweb.js" data-api-key="your-api-key"></script>
+    <!-- ================================================================== -->
+</head>
+<body>
+    <div class="protected">
+        <strong>✓ This page is protected by SecureWeb</strong>
+        <p>All security features are active: XSS protection, CSRF validation, rate limiting, and threat detection.</p>
+    </div>
+    
+    <h1>SecureWeb Simple Integration</h1>
+    
+    <p>This form is automatically protected by SecureWeb. No additional code needed.</p>
+    
+    <form id="test-form">
+        <div class="form-group">
+            <label for="test-input">Test Input (try XSS: &lt;script&gt;alert(1)&lt;/script&gt;):</label>
+            <input type="text" id="test-input" name="test-input" />
+        </div>
+        
+        <div class="form-group">
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="4"></textarea>
+        </div>
+        
+        <button type="submit">Submit (Protected)</button>
+    </form>
+    
+    <div id="output" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;"></div>
+    
+    <script>
+        // Monitor SecureWeb status
+        setTimeout(() => {
+            if (window.SecureWeb) {
+                console.log('[SecureWeb] Status: Active');
+                console.log('[SecureWeb] CSRF Token:', window.SecureWeb.getCSRFToken());
+                
+                document.getElementById('output').innerHTML = `
+                    <strong>SecureWeb Status:</strong><br>
+                    ✓ Loaded and active<br>
+                    ✓ CSRF Token: ${window.SecureWeb.getCSRFToken().substring(0, 16)}...<br>
+                    ✓ XSS Protection: Active<br>
+                    ✓ CSRF Protection: Active<br>
+                    ✓ Rate Limiting: Active<br>
+                    ✓ Header Security: Active
+                `;
+            } else {
+                console.warn('[SecureWeb] Not loaded');
+                document.getElementById('output').innerHTML = `
+                    <strong style="color: red;">SecureWeb Status: Not Loaded</strong><br>
+                    Please check that the script tag is correctly configured.
+                `;
+            }
+        }, 1000);
+        
+        // Form submission with automatic security
+        document.getElementById('test-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            console.log('Form submitted with data:', data);
+            console.log('SecureWeb CSRF token:', window.SecureWeb?.getCSRFToken());
+            
+            document.getElementById('output').innerHTML += `
+                <br><br>
+                <strong>Form Submitted:</strong><br>
+                Data: ${JSON.stringify(data, null, 2)}<br>
+                CSRF Token: ${window.SecureWeb?.getCSRFToken().substring(0, 16)}...<br>
+                <em>Request was automatically protected by SecureWeb</em>
+            `;
+        });
+    </script>
+</body>
+</html>

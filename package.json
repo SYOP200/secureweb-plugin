@@ -1,0 +1,27 @@
+{
+  "name": "secureweb-plugin",
+  "version": "1.0.0",
+  "description": "Complete security solution for web applications with single-line integration",
+  "scripts": {
+    "install:all": "cd sdk && npm install && cd ../backend && npm install",
+    "build:all": "cd sdk && npm run build && cd ../backend && npm run build",
+    "dev": "concurrently \"cd sdk && npm run dev\" \"cd backend && npm run dev\"",
+    "start": "cd backend && npm start"
+  },
+  "keywords": [
+    "security",
+    "web-security",
+    "xss-protection",
+    "csrf-protection",
+    "rate-limiting"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "workspaces": [
+    "sdk",
+    "backend"
+  ]
+}

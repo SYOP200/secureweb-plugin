@@ -1,0 +1,28 @@
+{
+  "name": "secureweb-sdk",
+  "version": "1.0.0",
+  "description": "Client-side security SDK for web applications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "security",
+    "xss",
+    "csrf",
+    "rate-limiting",
+    "web-security"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}

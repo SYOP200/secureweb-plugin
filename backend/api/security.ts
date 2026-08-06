@@ -1,59 +1,32 @@
-/**
- * SecureWeb Backend Service
- * Handles security monitoring, threat detection, and attack prevention
- */
-
+import { VercelRequest, VercelResponse } from '@vercel/node';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { SecurityAnalyzer } from './security-analyzer';
-import { ThreatDatabase } from './threat-database';
+import { SecurityAnalyzer } from '../src/security-analyzer';
+import { ThreatDatabase } from '../src/threat-database';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 const securityAnalyzer = new SecurityAnalyzer();
 const threatDatabase = new ThreatDatabase();
 
 // Security middleware
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-    }
-  },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  }
+  contentSecurityPolicy: false, // Disable for serverless
+  hsts: false
 }));
 
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests from any origin with the SDK
-    callback(null, true);
-  },
+  origin: '*',
   credentials: true
 }));
 
-// Rate limiting for API endpoints
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // Limit each IP to 1000 requests per windowMs
-  message: 'Too many requests from this IP'
-});
-
-app.use('/api/', apiLimiter);
 app.use(express.json({ limit: '10kb' }));
 
 // Request logging and analysis
-app.use(async (req, res, next) => {
-  const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
-  const userAgent = req.get('user-agent');
+app.use(async (req: any, res: any, next: any) => {
+  const clientIP = req.headers['x-forwarded-for'] as string || req.headers['x-real-ip'] as string || 'unknown';
+  const userAgent = req.headers['user-agent'] as string;
   
   const threatLevel = await securityAnalyzer.analyzeRequest({
     ip: clientIP,
@@ -72,12 +45,12 @@ app.use(async (req, res, next) => {
 });
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (req: any, res: any) => {
   res.json({ status: 'healthy', timestamp: Date.now() });
 });
 
 // CSRF token validation endpoint
-app.post('/api/security/validate-csrf', async (req, res) => {
+app.post('/api/security/validate-csrf', async (req: any, res: any) => {
   try {
     const { token, apiKey } = req.body;
     
@@ -95,19 +68,15 @@ app.post('/api/security/validate-csrf', async (req, res) => {
 });
 
 // Security metrics endpoint
-app.post('/api/security/metrics', async (req, res) => {
+app.post('/api/security/metrics', async (req: any, res: any) => {
   try {
     const metrics = req.body;
     
-    // Validate API key
     if (!await securityAnalyzer.validateApiKey(metrics.apiKey)) {
       return res.status(401).json({ error: 'Invalid API key' });
     }
 
-    // Store metrics for analysis
     await threatDatabase.storeMetrics(metrics);
-    
-    // Analyze for patterns
     const analysis = await securityAnalyzer.analyzeMetrics(metrics);
     
     res.json({ 
@@ -122,7 +91,7 @@ app.post('/api/security/metrics', async (req, res) => {
 });
 
 // Security events endpoint
-app.post('/api/security/events', async (req, res) => {
+app.post('/api/security/events', async (req: any, res: any) => {
   try {
     const event = req.body;
     
@@ -130,10 +99,7 @@ app.post('/api/security/events', async (req, res) => {
       return res.status(401).json({ error: 'Invalid API key' });
     }
 
-    // Store event
     await threatDatabase.storeEvent(event);
-    
-    // Analyze event for threats
     const threatAnalysis = await securityAnalyzer.analyzeEvent(event);
     
     if (threatAnalysis.isThreat) {
@@ -152,34 +118,8 @@ app.post('/api/security/events', async (req, res) => {
   }
 });
 
-// Webhook security endpoint
-app.post('/api/security/webhook', async (req, res) => {
-  try {
-    const { apiKey, payload, signature } = req.body;
-    
-    if (!await securityAnalyzer.validateApiKey(apiKey)) {
-      return res.status(401).json({ error: 'Invalid API key' });
-    }
-
-    // Verify webhook signature
-    const isValid = await securityAnalyzer.verifyWebhookSignature(payload, signature);
-    
-    if (!isValid) {
-      return res.status(403).json({ error: 'Invalid signature' });
-    }
-
-    // Process webhook
-    await securityAnalyzer.processWebhook(payload);
-    
-    res.json({ success: true });
-  } catch (error) {
-    console.error('[Security] Webhook processing error:', error);
-    res.status(500).json({ error: 'Failed to process webhook' });
-  }
-});
-
 // Threat intelligence endpoint
-app.get('/api/security/threats/:apiKey', async (req, res) => {
+app.get('/api/security/threats/:apiKey', async (req: any, res: any) => {
   try {
     const { apiKey } = req.params;
     
@@ -197,7 +137,7 @@ app.get('/api/security/threats/:apiKey', async (req, res) => {
 });
 
 // Security report endpoint
-app.get('/api/security/report/:apiKey', async (req, res) => {
+app.get('/api/security/report/:apiKey', async (req: any, res: any) => {
   try {
     const { apiKey } = req.params;
     const { days = 7 } = req.query;
@@ -216,17 +156,10 @@ app.get('/api/security/report/:apiKey', async (req, res) => {
 });
 
 // Error handling
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, req: any, res: any, next: any) => {
   console.error('[Server] Error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// Start server only if not running in serverless environment
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`SecureWeb backend server running on port ${PORT}`);
-    console.log(`Security monitoring active`);
-  });
-}
-
+// Export for Vercel
 export default app;

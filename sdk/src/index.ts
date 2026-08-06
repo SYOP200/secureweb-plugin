@@ -36,7 +36,17 @@ class SecureWeb {
   }
 
   private generateCSRFToken(): string {
-    return Array.from(crypto.getRandomValues(new Uint8Array(32)))
+    // Browser-compatible random token generation
+    const array = new Uint8Array(32);
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      crypto.getRandomValues(array);
+    } else {
+      // Fallback for older browsers
+      for (let i = 0; i < array.length; i++) {
+        array[i] = Math.floor(Math.random() * 256);
+      }
+    }
+    return Array.from(array)
       .map(b => b.toString(16).padStart(2, '0'))
       .join('');
   }

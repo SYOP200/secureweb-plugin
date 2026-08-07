@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureWeb - Final Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #console-output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .url-box {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 SecureWeb - Final Integration Test</h1>
+        
+        <div id="status-area"></div>
+        
+        <div class="info">
+            <strong>Your Configuration:</strong>
+            <div class="url-box"><strong>SDK:</strong> https://secureweb-eg4t3di36-syop200s-projects.vercel.app/secureweb.js</div>
+            <div class="url-box"><strong>Backend:</strong> https://secureweb-backend-production.up.railway.app</div>
+            <div class="url-box"><strong>API Key:</strong> test-key-123</div>
+        </div>
+        
+        <hr style="margin: 30px 0;">
+        
+        <h2>Test Form (Protected by SecureWeb)</h2>
+        <form id="test-form">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" rows="4" required placeholder="Enter your message"></textarea>
+            </div>
+            <button type="submit">Submit Form (Protected)</button>
+        </form>
+        
+        <div id="console-output"></div>
+    </div>
+
+    <!-- SecureWeb SDK - Pre-configured with your URLs -->
+    <script 
+      src="https://secureweb-eg4t3di36-syop200s-projects.vercel.app/secureweb.js" 
+      data-api-key="test-key-123"
+      data-endpoint="https://secureweb-backend-production.up.railway.app"
+      data-debug="true">
+    </script>
+    
+    <script>
+        const consoleOutput = document.getElementById('console-output');
+        const statusArea = document.getElementById('status-area');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const line = document.createElement('div');
+            line.textContent = `[${timestamp}] ${message}`;
+            consoleOutput.appendChild(line);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            console.log(`[SecureWeb Test] ${message}`);
+        }
+        
+        function showStatus(message, type) {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            statusArea.appendChild(div);
+        }
+        
+        // Wait for SDK to load
+        setTimeout(() => {
+            if (window.SecureWeb) {
+                log('✓ SecureWeb SDK loaded successfully', 'success');
+                showStatus('✓ SecureWeb SDK loaded successfully', 'success');
+                
+                const token = window.SecureWeb.getCSRFToken();
+                log(`✓ CSRF Token generated: ${token.substring(0, 16)}...`, 'success');
+                showStatus(`✓ CSRF Token generated: ${token.substring(0, 16)}...`, 'success');
+                
+                // Check form protection
+                setTimeout(() => {
+                    const form = document.getElementById('test-form');
+                    const tokenInput = form.querySelector('input[name="secureweb_csrf_token"]');
+                    if (tokenInput) {
+                        log('✓ CSRF token injected into form', 'success');
+                        showStatus('✓ CSRF token automatically injected into form', 'success');
+                    } else {
+                        log('⚠ CSRF token not yet in form (may appear shortly)', 'info');
+                    }
+                    
+                    // Test backend connection
+                    testBackendConnection();
+                }, 1000);
+            } else {
+                log('✗ SecureWeb SDK not loaded', 'error');
+                showStatus('✗ SecureWeb SDK failed to load - check browser console for errors', 'error');
+            }
+        }, 2000);
+        
+        async function testBackendConnection() {
+            log('Testing backend connection...', 'info');
+            
+            try {
+                const response = await fetch('https://secureweb-backend-production.up.railway.app/health');
+                const result = await response.json();
+                
+                if (result.status === 'healthy') {
+                    log('✓ Backend connection successful', 'success');
+                    showStatus('✓ Backend connection successful - Service is healthy', 'success');
+                } else {
+                    log('✗ Backend returned unexpected status', 'error');
+                    showStatus('✗ Backend returned unexpected status', 'error');
+                }
+            } catch (error) {
+                log(`✗ Backend connection failed: ${error.message}`, 'error');
+                showStatus('✗ Backend connection failed - check if service is running', 'error');
+            }
+        }
+        
+        // Form submission handler
+        document.getElementById('test-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            log('Form submitted', 'info');
+            log(`Form data: ${JSON.stringify(data, null, 2)}`, 'info');
+            
+            if (window.SecureWeb) {
+                const csrfToken = window.SecureWeb.getCSRFToken();
+                log(`CSRF Token: ${csrfToken.substring(0, 16)}...`, 'info');
+                
+                // Send to backend
+                try {
+                    log('Sending metrics to backend...', 'info');
+                    
+                    const response = await fetch('https://secureweb-backend-production.up.railway.app/api/security/metrics', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-SecureWeb-CSRF-Token': csrfToken
+                        },
+                        body: JSON.stringify({
+                            apiKey: 'test-key-123',
+                            timestamp: Date.now(),
+                            url: window.location.href,
+                            userAgent: navigator.userAgent,
+                            requestCount: 1,
+                            csrfToken: csrfToken
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    log(`✓ Backend response: ${JSON.stringify(result, null, 2)}`, 'success');
+                    showStatus('✓ Form submitted successfully - Security protection active!', 'success');
+                } catch (error) {
+                    log(`Backend error: ${error.message}`, 'error');
+                    showStatus('⚠ Backend communication failed - but client-side protection is active', 'info');
+                }
+            } else {
+                log('SecureWeb not loaded', 'error');
+                showStatus('✗ SecureWeb not loaded', 'error');
+            }
+        });
+        
+        // Initial status
+        showStatus('⏳ Loading SecureWeb SDK...', 'info');
+        log('Test page loaded. Waiting for SDK to initialize...', 'info');
+    </script>
+</body>
+</html>

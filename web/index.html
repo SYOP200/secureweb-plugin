@@ -232,6 +232,26 @@
         const API_BASE = 'https://secureweb-backend-production.up.railway.app';
         let currentUser = null;
 
+        // Check if backend is ready
+        async function checkBackend() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                return response.ok;
+            } catch {
+                return false;
+            }
+        }
+
+        // Show backend status on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            const isReady = await checkBackend();
+            if (!isReady) {
+                showMessage('message', 'Backend is updating. Please try again in a few minutes.', 'info');
+            }
+        });
+
+        function showMessage(elementId, message, type) {
+
         function showMessage(elementId, message, type) {
             const element = document.getElementById(elementId);
             element.textContent = message;

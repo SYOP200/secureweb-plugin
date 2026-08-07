@@ -1,0 +1,8 @@
+{
+  "name": "secureweb-web",
+  "version": "1.0.0",
+  "description": "SecureWeb signup and login interface",
+  "scripts": {
+    "deploy": "vercel --prod"
+  }
+}

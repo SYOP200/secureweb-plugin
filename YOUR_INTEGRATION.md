@@ -6,9 +6,38 @@
 
 **SDK:** `https://syop200.github.io/secureweb-sdk/index.js` ✅ **WORKING**  
 **Backend:** `https://secureweb-backend-production.up.railway.app` ✅ **WORKING**  
+**Signup Page:** `https://web-eight-orpin-q9574rsedw.vercel.app` ✅ **WORKING**  
 **API Key:** `test-key-123` (for testing)
 
 ## 🚀 Your Production Integration
+
+### For Users (Signup for API Token):
+
+Users can sign up at: `https://web-eight-orpin-q9574rsedw.vercel.app`
+
+They will get an API token to use in their integration.
+
+### For Testing (Use your test key):
+
+```html
+<script 
+  src="https://syop200.github.io/secureweb-sdk/index.js" 
+  data-api-key="test-key-123"
+  data-endpoint="https://secureweb-backend-production.up.railway.app">
+</script>
+```
+
+### For Production (User's own token):
+
+After users sign up and get their token, they use:
+
+```html
+<script 
+  src="https://syop200.github.io/secureweb-sdk/index.js" 
+  data-api-key="THEIR_API_TOKEN"
+  data-endpoint="https://secureweb-backend-production.up.railway.app">
+</script>
+```
 
 Add this single line to any website you want to protect:
 

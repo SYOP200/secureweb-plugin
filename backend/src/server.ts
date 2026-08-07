@@ -71,6 +71,23 @@ app.use(async (req, res, next) => {
   next();
 });
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    service: 'SecureWeb Backend',
+    status: 'running',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      validateCsrf: '/api/security/validate-csrf',
+      metrics: '/api/security/metrics',
+      events: '/api/security/events',
+      threats: '/api/security/threats/:apiKey',
+      report: '/api/security/report/:apiKey'
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: Date.now() });

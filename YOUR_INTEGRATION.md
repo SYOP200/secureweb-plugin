@@ -1,12 +1,57 @@
 # Your SecureWeb Integration
 
-## 🎉 Your Deployment is Ready!
+## 🎉 Backend Deployment is Ready!
 
-### **Your URLs:**
+### **Working URLs:**
 
-**SDK:** `https://secureweb-eg4t3di36-syop200s-projects.vercel.app/secureweb.js`  
-**Backend:** `https://secureweb-backend-production.up.railway.app`  
+**Backend:** `https://secureweb-backend-production.up.railway.app` ✅ **WORKING**  
 **API Key:** `test-key-123` (for testing)
+
+### **SDK Issue - Needs Alternative Hosting**
+
+The Vercel SDK deployment has authentication issues. Use one of these alternatives:
+
+### Option 1: GitHub Pages (Recommended - Free)
+
+1. **Create a new GitHub repository** called `secureweb-sdk`
+2. **Upload the SDK file** from `sdk-deploy/index.js` to the repository
+3. **Enable GitHub Pages** in repository settings
+4. **Your SDK URL will be:** `https://yourusername.github.io/secureweb-sdk/index.js`
+
+### Option 2: Netlify (Free)
+
+```bash
+npm install -g netlify-cli
+cd /Users/syop200/secureweb-plugin/sdk-deploy
+netlify deploy --prod
+```
+
+### Option 3: Use the Local File (For Testing)
+
+```html
+<script src="sdk-deploy/index.js" 
+  data-api-key="test-key-123"
+  data-endpoint="https://secureweb-backend-production.up.railway.app">
+</script>
+```
+
+## 🚀 Integration Once SDK is Hosted
+
+```html
+<script 
+  src="YOUR_SDK_URL_HERE" 
+  data-api-key="test-key-123"
+  data-endpoint="https://secureweb-backend-production.up.railway.app">
+</script>
+```
+
+Replace `YOUR_SDK_URL_HERE` with your chosen SDK hosting URL.
+
+## 🧪 Test Backend Only
+
+Since the backend is working, you can test it with `examples/backend-only-test.html`
+
+## 🔧 SDK Hosting Alternatives
 
 ## 🚀 Add to Your Website
 

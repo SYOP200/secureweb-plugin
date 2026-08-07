@@ -1,65 +1,20 @@
 # Your SecureWeb Integration
 
-## 🎉 Backend Deployment is Ready!
+## 🎉 Production Deployment is Complete!
 
-### **Working URLs:**
+### **Your Production URLs:**
 
+**SDK:** `https://syop200.github.io/secureweb-sdk/index.js` ✅ **WORKING**  
 **Backend:** `https://secureweb-backend-production.up.railway.app` ✅ **WORKING**  
 **API Key:** `test-key-123` (for testing)
 
-### **SDK Issue - Needs Alternative Hosting**
+## 🚀 Your Production Integration
 
-The Vercel SDK deployment has authentication issues. Use one of these alternatives:
-
-### Option 1: GitHub Pages (Recommended - Free)
-
-1. **Create a new GitHub repository** called `secureweb-sdk`
-2. **Upload the SDK file** from `sdk-deploy/index.js` to the repository
-3. **Enable GitHub Pages** in repository settings
-4. **Your SDK URL will be:** `https://yourusername.github.io/secureweb-sdk/index.js`
-
-### Option 2: Netlify (Free)
-
-```bash
-npm install -g netlify-cli
-cd /Users/syop200/secureweb-plugin/sdk-deploy
-netlify deploy --prod
-```
-
-### Option 3: Use the Local File (For Testing)
-
-```html
-<script src="sdk-deploy/index.js" 
-  data-api-key="test-key-123"
-  data-endpoint="https://secureweb-backend-production.up.railway.app">
-</script>
-```
-
-## 🚀 Integration Once SDK is Hosted
+Add this single line to any website you want to protect:
 
 ```html
 <script 
-  src="YOUR_SDK_URL_HERE" 
-  data-api-key="test-key-123"
-  data-endpoint="https://secureweb-backend-production.up.railway.app">
-</script>
-```
-
-Replace `YOUR_SDK_URL_HERE` with your chosen SDK hosting URL.
-
-## 🧪 Test Backend Only
-
-Since the backend is working, you can test it with `examples/backend-only-test.html`
-
-## 🔧 SDK Hosting Alternatives
-
-## 🚀 Add to Your Website
-
-Copy and paste this single line into your website's `<head>` section:
-
-```html
-<script 
-  src="https://secureweb-eg4t3di36-syop200s-projects.vercel.app/secureweb.js" 
+  src="https://syop200.github.io/secureweb-sdk/index.js" 
   data-api-key="test-key-123"
   data-endpoint="https://secureweb-backend-production.up.railway.app">
 </script>
@@ -67,19 +22,9 @@ Copy and paste this single line into your website's `<head>` section:
 
 That's it! Your website is now protected.
 
-## 🧪 Test Your Integration
+## 🧪 Test Your Production Integration
 
-### Option 1: Quick Test
-Open `examples/final-test.html` in your browser - it's pre-configured with your URLs.
-
-### Option 2: Simple Test
-Open `examples/simple-usage.html` - shows minimal integration example.
-
-### Option 3: Test on Your Own Site
-1. Add the script tag to your website
-2. Open browser console (F12)
-3. Type: `window.SecureWeb`
-4. You should see the SecureWeb object
+Open `examples/production-test.html` in your browser - it's pre-configured with your production URLs.
 
 ## ✅ What's Being Protected
 
@@ -95,7 +40,7 @@ Remove `data-debug="true"` for production (reduces console logging):
 
 ```html
 <script 
-  src="https://secureweb-eg4t3di36-syop200s-projects.vercel.app/secureweb.js" 
+  src="https://syop200.github.io/secureweb-sdk/index.js" 
   data-api-key="test-key-123"
   data-endpoint="https://secureweb-backend-production.up.railway.app">
 </script>
@@ -112,6 +57,7 @@ Check your Railway dashboard for:
 
 Your backend provides these endpoints:
 
+- `GET /` - Service information
 - `GET /health` - Health check
 - `POST /api/security/validate-csrf` - CSRF validation
 - `POST /api/security/metrics` - Security metrics
@@ -155,7 +101,7 @@ For production use:
 
 ## 🎯 Next Steps
 
-1. ✅ Test with provided examples
+1. ✅ Test with `examples/production-test.html`
 2. ✅ Add to your actual website
 3. ✅ Monitor security events
 4. ✅ Configure production settings

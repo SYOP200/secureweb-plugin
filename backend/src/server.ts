@@ -7,12 +7,16 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
 import { SecurityAnalyzer } from './security-analyzer';
 import { ThreatDatabase } from './threat-database';
+import authRoutes from './auth';
+import { Database } from './database';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const securityAnalyzer = new SecurityAnalyzer();
+const database = new Database();
+const securityAnalyzer = new SecurityAnalyzer(database);
 const threatDatabase = new ThreatDatabase();
 
 // Security middleware
@@ -92,6 +96,12 @@ app.get('/', (req, res) => {
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy', timestamp: Date.now() });
 });
+
+// Auth routes
+app.use('/api/auth', authRoutes);
+
+// Serve static web interface
+app.use(express.static(path.join(__dirname, '../../web')));
 
 // CSRF token validation endpoint
 app.post('/api/security/validate-csrf', async (req, res) => {

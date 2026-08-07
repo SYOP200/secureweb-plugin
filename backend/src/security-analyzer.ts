@@ -3,6 +3,7 @@
  */
 
 import crypto from 'crypto';
+import { Database } from './database';
 
 interface SecurityRequest {
   ip: string;
@@ -55,7 +56,7 @@ export class SecurityAnalyzer {
     /<iframe[^>]*>/gi
   ];
 
-  constructor() {
+  constructor(private database?: Database) {
     this.initializeKnownThreats();
   }
 
@@ -157,8 +158,12 @@ export class SecurityAnalyzer {
   }
 
   async validateApiKey(apiKey: string): Promise<boolean> {
-    // In production, validate against database
-    // For demo, accept any non-empty key
+    // Use database to validate API tokens
+    if (this.database) {
+      const user = this.database.validateApiToken(apiKey);
+      return Boolean(user);
+    }
+    // Fallback for demo - accept any non-empty key
     return Boolean(apiKey && apiKey.length > 0);
   }
 
